@@ -6,6 +6,8 @@
 
 A sleek and lightweight energy flow card for Home Assistant Lovelace UI. It visualizes real-time power distribution with smooth bezier curves, interactive hover effects, and a fully native visual editor.
 
+![Fluxe Card Demo](assets/FluxeCardDemo.gif)
+
 ---
 
 ## Features
