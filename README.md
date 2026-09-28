@@ -6,7 +6,7 @@
 
 A sleek and lightweight energy flow card for Home Assistant Lovelace UI. It visualizes real-time power distribution with smooth bezier curves, interactive hover effects, and a fully native visual editor.
 
-![Fluxe Card Demo](assets/FluxeCardDemo.gif)
+<img src="assets/FluxeCardDemo.gif" alt="Fluxe Card Demo" width="400">
 
 ---
 
@@ -51,27 +51,25 @@ You can fully configure the card using the visual card editor in Dashboard edit 
 ### YAML Example
 
 ```yaml
-type: custom-fluxe-card
+type: custom:fluxe-card
 title: Instant Energy Flow
-main_entity: sensor.power_meter
+main_entity: sensor.grid_power
 main_name: Grid
 main_icon: mdi:transmission-tower
-main_color: "#f97316"
 max_power: 3000
-default_view: active
+other_name: Other
+other_color: '#64748b'
+devices:
+  - entity: sensor.lights_power
+    name: Lights
+    icon: mdi:lightbulb-group
+    color: '#f1c40f'
+  - entity: sensor.workstation_power
+    name: Workstation
+    icon: mdi:desktop-tower-monitor
+    color: '#3498db'
 show_toggle_button: true
 show_other: true
 other_mode: difference
-devices:
-  - entity: sensor.fridge_power
-    name: Fridge
-    icon: mdi:fridge
-    color: "#a855f7"
-  - entity: sensor.pc_power
-    name: Workstation
-    icon: mdi:desktop-tower
-    color: "#06b6d4"
-  - entity: sensor.lights_power
-    name: Lights
-    icon: mdi:lightbulb
-    color: "#eab308"
+default_view: active
+```
