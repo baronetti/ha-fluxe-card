@@ -1,7 +1,7 @@
 # ⚡ Fluxe Card (`fluxe-card`)
 
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-41BDF5.svg)](https://github.com/hacs/default)
-[![GitHub Release](https://img.shields.io/github/v/release/baronetti/ha-fluxe-card)](https://github.com/baronetti/ha-fluxe-card/releases)
+[![GitHub Release](https://img.shields.io/github/v/release/baronetti/ha-fluxe-card?color=41BDF5&style=flat-square)](https://github.com/baronetti/ha-fluxe-card/releases)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 A sleek and lightweight energy flow card for Home Assistant Lovelace UI. It visualizes real-time power distribution with smooth bezier curves, interactive hover effects, and a fully native visual editor.
