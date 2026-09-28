@@ -18,7 +18,7 @@ class FluxeCard extends HTMLElement {
   }
 
   static getConfigElement() {
-    return document.createElement('fluxe-card');
+    return document.createElement('fluxe-card-editor');
   }
 
   static getStubConfig() {
@@ -593,8 +593,6 @@ class FluxeCard extends HTMLElement {
   }
 }
 
-customElements.define('fluxe-card', FluxeCard);
-
 class FluxeCardEditor extends HTMLElement {
   constructor() {
     super();
@@ -887,4 +885,5 @@ class FluxeCardEditor extends HTMLElement {
   }
 }
 
-customElements.define('fluxe-card', FluxeCardEditor);
+customElements.define('fluxe-card', FluxeCard);
+customElements.define('fluxe-card-editor', FluxeCardEditor);
