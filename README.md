@@ -28,11 +28,11 @@ A sleek and lightweight energy flow card for Home Assistant Lovelace UI. It visu
 ### Method 1: HACS (Recommended)
 
 1. Open **HACS** in your Home Assistant instance.
-2. Click on the three dots in the top right corner and select **Custom repositories**.
-3. Add the Repository URL: `https://github.com/baronetti/ha-fluxe-card`
-4. Select **Dashboard** as the category.
-5. Click **Add**, search for **Fluxe Card**, and click **Download**.
-6. Refresh your browser page.
+2. Search for **Fluxe Card**.
+3. Click **Download**.
+4. Refresh your browser page.
+
+> **Note:** If the card is not yet listed in the default catalog, you can temporarily add it as a custom repository: open **HACS**, click the 3 dots in the top right corner, select **Custom repositories**, add `https://github.com/baronetti/ha-fluxe-card` as category **Dashboard**, and click **Add**.
 
 ### Method 2: Manual Installation
 
