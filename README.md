@@ -14,7 +14,7 @@ A sleek and lightweight energy flow card for Home Assistant Lovelace UI. It visu
 
 ## Features
 
-- **High Performance:** DOM-preserving architecture for ultra-smooth 60 FPS animations.
+- **High Performance:** DOM-preserving architecture for ultra-smooth 60 FPS animations with full XSS protection.
 - **Fully Customizable:** Custom icons, custom labels, and personalized color coding for every load.
 - **Dynamic Flow Lines:** Line thickness automatically scales according to actual power consumption.
 - **Native UI Editor:** Seamless integration with Home Assistant's card editor (no manual YAML required).
