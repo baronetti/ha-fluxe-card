@@ -1,3 +1,22 @@
+const escapeHtml = (str) => {
+  if (str === null || str === undefined) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+};
+
+const sanitizeColor = (color, fallback = '#38bdf8') => {
+  if (typeof color !== 'string') return fallback;
+  const trimmed = color.trim();
+  if (/^#([0-9a-fA-F]{3,4}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/.test(trimmed)) return trimmed;
+  if (/^(rgb|hsl)a?\([\d\s,%.-]+\)$/i.test(trimmed)) return trimmed;
+  if (/^var\(--[a-zA-Z0-9_-]+\)$/.test(trimmed)) return trimmed;
+  return fallback;
+};
+
 window.customCards = window.customCards || [];
 if (!window.customCards.some(c => c.type === 'fluxe-card')) {
   window.customCards.push({
@@ -88,9 +107,9 @@ class FluxeCard extends HTMLElement {
 
     const mainEntity = hass.states[config.main_entity];
     const mainVal = mainEntity ? parseFloat(mainEntity.state) || 0 : 0;
-    const mainTitle = config.main_name || 'Grid';
-    const mainIcon = config.main_icon || 'mdi:transmission-tower';
-    const mainColor = config.main_color || '#f97316';
+    const mainTitle = escapeHtml(config.main_name || 'Grid');
+    const mainIcon = escapeHtml(config.main_icon || 'mdi:transmission-tower');
+    const mainColor = sanitizeColor(config.main_color, '#f97316');
 
     const formatPower = (val) => {
       if (val >= 1000) return (val / 1000).toFixed(2) + ' kW';
@@ -105,17 +124,17 @@ class FluxeCard extends HTMLElement {
         const val = stateObj ? parseFloat(stateObj.state) || 0 : 0;
         monitoredSum += val;
         
-        const name = dev.name || (stateObj && stateObj.attributes && stateObj.attributes.friendly_name) || dev.entity;
-        const icon = dev.icon || (stateObj && stateObj.attributes && stateObj.attributes.icon) || 'mdi:flash';
-        const color = dev.color || '#38bdf8';
+        const rawName = dev.name || (stateObj && stateObj.attributes && stateObj.attributes.friendly_name) || dev.entity;
+        const rawIcon = dev.icon || (stateObj && stateObj.attributes && stateObj.attributes.icon) || 'mdi:flash';
+        const color = sanitizeColor(dev.color, '#38bdf8');
 
         return {
           ...dev,
-          name: name,
+          name: rawName,
           val: val,
           formatted: formatPower(val),
           color: color,
-          icon: icon,
+          icon: rawIcon,
           isOther: false
         };
       })
@@ -140,7 +159,7 @@ class FluxeCard extends HTMLElement {
         name: config.other_name || 'Other / Unmonitored',
         val: altroVal,
         formatted: formatPower(altroVal),
-        color: config.other_color || '#64748b',
+        color: sanitizeColor(config.other_color, '#64748b'),
         icon: config.other_icon || 'mdi:dots-horizontal-circle-outline',
         isOther: true
       };
@@ -152,7 +171,7 @@ class FluxeCard extends HTMLElement {
       ? allDevices 
       : allDevices.filter(dev => dev.val > 2);
 
-    this._renderedKey = this._devices.map(d => d.entity + d.name).join('|') + '|' + this._showAll;
+    this._renderedKey = this._devices.map(d => String(d.entity) + String(d.name)).join('|') + '|' + this._showAll;
 
     const deviceHeight = 70;
     const minCardHeight = Math.max(200, this._devices.length * deviceHeight);
@@ -168,17 +187,23 @@ class FluxeCard extends HTMLElement {
       this._devices.forEach((dev) => {
         const isOther = dev.isOther;
         const canClick = !isOther || (isOther && dev.entity);
+        const safeColor = sanitizeColor(dev.color, '#38bdf8');
+        const safeEntity = escapeHtml(dev.entity);
+        const safeIcon = escapeHtml(dev.icon);
+        const safeName = escapeHtml(dev.name);
+        const safeFormatted = escapeHtml(dev.formatted);
+
         pillsHtml += `
           <div class="pill-wrapper">
             <div class="pill ${canClick ? 'clickable' : ''} ${isOther ? 'pill-other' : ''}" 
-                 ${canClick ? `data-entity="${dev.entity}"` : ''} 
-                 style="--pill-color: ${dev.color}; opacity: ${isOther ? 0.7 : (dev.val > 2 ? 1 : 0.5)};">
+                 ${canClick ? `data-entity="${safeEntity}"` : ''} 
+                 style="--pill-color: ${safeColor}; opacity: ${isOther ? 0.7 : (dev.val > 2 ? 1 : 0.5)};">
               <div class="pill-icon">
-                <ha-icon icon="${dev.icon}"></ha-icon>
+                <ha-icon icon="${safeIcon}"></ha-icon>
               </div>
               <div class="pill-info">
-                <span class="pill-name">${dev.name}</span>
-                <span class="pill-val">${dev.formatted}</span>
+                <span class="pill-name">${safeName}</span>
+                <span class="pill-val">${safeFormatted}</span>
               </div>
             </div>
           </div>
@@ -189,6 +214,9 @@ class FluxeCard extends HTMLElement {
     const toggleIcon = this._showAll ? 'mdi:eye-off' : 'mdi:eye';
     const toggleText = this._showAll ? 'Active only' : 'Show all';
     const showToggleButton = config.show_toggle_button !== false;
+    const safeTitle = escapeHtml(config.title || 'Energy Flow');
+    const safeMainEntity = escapeHtml(config.main_entity);
+    const safeMainVal = escapeHtml(formatPower(mainVal));
 
     this.shadowRoot.innerHTML = `
       <style>
@@ -374,7 +402,7 @@ class FluxeCard extends HTMLElement {
 
       <div class="card">
         <div class="header">
-          <span class="title">${config.title || 'Energy Flow'}</span>
+          <span class="title">${safeTitle}</span>
           ${showToggleButton ? `
             <div class="toggle-btn">
               <ha-icon icon="${toggleIcon}"></ha-icon>
@@ -383,9 +411,9 @@ class FluxeCard extends HTMLElement {
           ` : ''}
         </div>
         <div class="layout">
-          <div class="main-node clickable" data-entity="${config.main_entity}">
+          <div class="main-node clickable" data-entity="${safeMainEntity}">
             <ha-icon icon="${mainIcon}"></ha-icon>
-            <span class="main-val">${formatPower(mainVal)}</span>
+            <span class="main-val">${safeMainVal}</span>
             <span class="main-title">${mainTitle}</span>
           </div>
 
@@ -455,17 +483,17 @@ class FluxeCard extends HTMLElement {
         const val = stateObj ? parseFloat(stateObj.state) || 0 : 0;
         monitoredSum += val;
         
-        const name = dev.name || (stateObj && stateObj.attributes && stateObj.attributes.friendly_name) || dev.entity;
-        const icon = dev.icon || (stateObj && stateObj.attributes && stateObj.attributes.icon) || 'mdi:flash';
-        const color = dev.color || '#38bdf8';
+        const rawName = dev.name || (stateObj && stateObj.attributes && stateObj.attributes.friendly_name) || dev.entity;
+        const rawIcon = dev.icon || (stateObj && stateObj.attributes && stateObj.attributes.icon) || 'mdi:flash';
+        const color = sanitizeColor(dev.color, '#38bdf8');
 
         return {
           ...dev,
-          name: name,
+          name: rawName,
           val: val,
           formatted: formatPower(val),
           color: color,
-          icon: icon,
+          icon: rawIcon,
           isOther: false
         };
       })
@@ -490,7 +518,7 @@ class FluxeCard extends HTMLElement {
         name: config.other_name || 'Other / Unmonitored',
         val: altroVal,
         formatted: formatPower(altroVal),
-        color: config.other_color || '#64748b',
+        color: sanitizeColor(config.other_color, '#64748b'),
         icon: config.other_icon || 'mdi:dots-horizontal-circle-outline',
         isOther: true
       };
@@ -502,7 +530,7 @@ class FluxeCard extends HTMLElement {
       ? allDevices 
       : allDevices.filter(dev => dev.val > 2);
 
-    const newKey = newDevices.map(d => d.entity + d.name).join('|') + '|' + this._showAll;
+    const newKey = newDevices.map(d => String(d.entity) + String(d.name)).join('|') + '|' + this._showAll;
 
     if (this._renderedKey !== newKey) {
       this.render();
@@ -576,7 +604,7 @@ class FluxeCard extends HTMLElement {
 
       pathsHtml += `
         <path d="${path}" 
-              stroke="${dev.color}" 
+              stroke="${sanitizeColor(dev.color, '#38bdf8')}" 
               stroke-width="${thickness}" 
               fill="none" 
               stroke-linecap="round"
@@ -800,6 +828,7 @@ class FluxeCardEditor extends HTMLElement {
       const displayName = dev.name || friendlyName || dev.entity || 'Unnamed';
       const displaySub = dev.name && friendlyName ? `${friendlyName} (${dev.entity})` : dev.entity;
       const displayIcon = dev.icon || stateObj?.attributes?.icon || 'mdi:flash';
+      const safeColor = dev.color ? sanitizeColor(dev.color, '#38bdf8') : '';
 
       const isEditing = this._editingIndex === index;
 
@@ -808,11 +837,11 @@ class FluxeCardEditor extends HTMLElement {
       row.innerHTML = `
         <div class="device-row-main">
           <div class="device-icon">
-            <ha-icon icon="${displayIcon}" style="${dev.color ? `color: ${dev.color};` : ''}"></ha-icon>
+            <ha-icon icon="${escapeHtml(displayIcon)}" style="${safeColor ? `color: ${safeColor};` : ''}"></ha-icon>
           </div>
           <div class="device-info">
-            <div class="device-title">${displayName}</div>
-            <div class="device-subtitle">${displaySub}</div>
+            <div class="device-title">${escapeHtml(displayName)}</div>
+            <div class="device-subtitle">${escapeHtml(displaySub)}</div>
           </div>
           <div class="device-actions">
             <button class="action-btn btn-delete" title="Delete">
